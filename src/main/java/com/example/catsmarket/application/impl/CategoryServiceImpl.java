@@ -25,7 +25,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getByName(String name) {
-        return categoryRepository.findByName(name).orElseThrow(() -> new CategoryNotFoundException(name));
+        return categoryRepository.findByName(name).orElseThrow(() -> {
+            log.error("Category with name {} not found", name);
+            return new CategoryNotFoundException(name);
+        });
     }
 
     @Override
@@ -37,6 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
 
         if (!notFoundCategories.isEmpty()) {
+            log.error("Category with names {} not found", notFoundCategories);
             throw new CategoryPartialResultException(notFoundCategories.toString());
         }
 
