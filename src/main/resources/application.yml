@@ -7,8 +7,19 @@ application:
         base-path: http://localhost:8081
         price: ${application.price-service.base-path}/api/v1/price/validation
 
+    features:
+        discount:
+            enabled: true
+            value: 0.3
+        price-validation:
+            enabled: false
+
+
 springdoc:
     swagger-ui:
         path: /swagger
     api-docs:
         path: /api-docs
+
+
+

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class InMemoryProductRepositoryImpl implements ProductRepository {
@@ -15,7 +16,7 @@ public class InMemoryProductRepositoryImpl implements ProductRepository {
     private final Map<String, Product> productMap;
 
     public InMemoryProductRepositoryImpl() {
-        this.productMap = new HashMap<>();
+        this.productMap = new ConcurrentHashMap<>();
     }
 
     @Override

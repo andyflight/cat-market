@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
@@ -16,13 +17,13 @@ public class InMemoryCategoryRepositoryImpl implements CategoryRepository {
     private final Map<String, Category> categoryMap;
 
     public InMemoryCategoryRepositoryImpl() {
-        this.categoryMap = Map.of(
+        this.categoryMap = new ConcurrentHashMap<>(Map.of(
                 "Food", Category.builder().name("Food").build(),
                 "Furniture", Category.builder().name("Furniture").build(),
                 "Toys", Category.builder().name("Toys").build(),
                 "Accessories", Category.builder().name("Accessories").build(),
                 "Health", Category.builder().name("Health").build()
-        );
+        ));
     }
 
     @Override
