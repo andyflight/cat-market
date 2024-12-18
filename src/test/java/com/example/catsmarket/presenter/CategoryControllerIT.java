@@ -45,7 +45,7 @@ public class CategoryControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void getCategoryByName_ShouldReturnCategory_WhenCategoryExists() {
-        mockMvc.perform(get("/api/v1/categories/food"))
+        mockMvc.perform(get("/api/v1/categories/Food"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Food")));
     }

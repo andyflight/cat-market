@@ -18,7 +18,7 @@ public class GalacticProductNameValidator implements ConstraintValidator<ValidGa
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
         if (value == null || value.trim().isEmpty()) {
-            return false; // Невалідна назва, якщо вона пуста або null
+            return false;
         }
 
         return pattern.matcher(value).matches();

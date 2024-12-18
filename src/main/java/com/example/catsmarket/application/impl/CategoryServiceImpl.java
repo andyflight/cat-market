@@ -8,6 +8,7 @@ import com.example.catsmarket.data.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,16 +20,19 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> getAllCategories(){
         return categoryRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Category getByName(String name) {
         return categoryRepository.findByName(name).orElseThrow(() -> new CategoryNotFoundException(name));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> getAllCategoriesByNames(List<String> names) {
         List<Category> categories = categoryRepository.findAllByName(names);
 

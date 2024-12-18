@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-test-data
+      author: andyflight
+      changes:
+        - loadData:
+            tableName: category
+            file: db/changelog/seed/categories.csv
+            separator: ","
