@@ -409,19 +409,20 @@ components:
           maxLength: 100
           minLength: 0
           type: string
-          description: Name of the product
-          example: Smartphone
+          description: Name of the product. Should contain Nebula|Star|Cat|Cosmo|Galactic
+            wod
+          example: Star catphone
         description:
           maxLength: 255
           minLength: 0
           type: string
           description: Description of the product
-          example: Latest model smartphone with 128GB storage
+          example: Flagship model from Andromeda galaxy
         price:
           type: number
           description: Price of the product
           format: double
-          example: 699.99
+          example: 69.99
         categoryNames:
           type: array
           description: List of category names the product belongs to
@@ -438,12 +439,13 @@ components:
           example: '123456789012'
         name:
           type: string
-          description: Name of the product
-          example: Smartphone
+          description: Name of the product. Should contain Nebula|Star|Cat|Cosmo|Galactic
+            wod
+          example: Star catphone
         description:
           type: string
           description: Description of the product
-          example: Latest model smartphone with 128GB storage
+          example: Flagship model from Andromeda galaxy
         price:
           type: number
           description: Price of the product
@@ -471,7 +473,7 @@ components:
         username:
           type: string
           description: Username for the customer's account
-          example: johndoe
+          example: johndoe123
         password:
           type: string
           description: Password for the customer's account
@@ -520,8 +522,8 @@ components:
       description: Request to create a new order
     OrderItemRequestDto:
       required:
+        - currentPrice
         - productCode
-        - productOldPrice
         - quantity
       type: object
       properties:
@@ -535,7 +537,7 @@ components:
           description: Quantity of the product ordered
           format: int32
           example: 2
-        productOldPrice:
+        currentPrice:
           type: number
           description: Price of the product at the time of order
           format: double
