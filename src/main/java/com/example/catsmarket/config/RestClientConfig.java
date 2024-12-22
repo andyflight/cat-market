@@ -16,7 +16,7 @@ public class RestClientConfig {
 
     private final int responseTimeout;
 
-    public RestClientConfig(@Value("${application.rest-client.response-timeout:1000}") int responseTimeout) {
+    public RestClientConfig(@Value("${application.rest-client.response-timeout:5000}") int responseTimeout) {
         this.responseTimeout = responseTimeout;
     }
 
