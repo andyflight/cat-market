@@ -1,6 +1,6 @@
 package com.example.catsmarket.application;
 
-import com.example.catsmarket.application.context.recommendation.PriceValidationContext;
+import com.example.catsmarket.application.context.price.PriceValidationContext;
 
 public interface PriceService {
 

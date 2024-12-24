@@ -1,7 +1,7 @@
 package com.example.catsmarket.application;
 
 import com.example.catsmarket.application.context.product.ProductContext;
-import com.example.catsmarket.application.context.recommendation.PriceValidationContext;
+import com.example.catsmarket.application.context.price.PriceValidationContext;
 import com.example.catsmarket.application.exceptions.PriceNotValidException;
 import com.example.catsmarket.application.exceptions.ProductNotFoundException;
 import com.example.catsmarket.data.ProductRepository;
@@ -223,7 +223,7 @@ public class ProductServiceTest {
                 .build();
 
         Product expectedProduct = Product.builder()
-                .code("123456789012")
+                .code("12345678900")
                 .name("cat product")
                 .description("cat product description")
                 .price(5.00)

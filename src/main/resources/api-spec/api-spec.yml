@@ -6,15 +6,27 @@ info:
 servers:
   - url: http://localhost:8080
     description: Generated server url
+tags:
+  - name: Customers
+    description: API for managing customers
+  - name: Products
+    description: API for managing products
+  - name: Orders
+    description: API for managing orders
+  - name: Categories
+    description: API for managing product categories
 paths:
   "/api/v1/products/{code}":
     get:
       tags:
-        - product-controller
+        - Products
+      summary: Retrieve product by UPC
+      description: This endpoint fetches a product based on its unique UPC code.
       operationId: getProductByCode
       parameters:
         - name: code
           in: path
+          description: The unique UPC code of the product
           required: true
           schema:
             type: string
@@ -27,11 +39,14 @@ paths:
                 "$ref": "#/components/schemas/ProductResponseDto"
     put:
       tags:
-        - product-controller
+        - Products
+      summary: Update product details
+      description: This endpoint updates the details of an existing product.
       operationId: updateProduct
       parameters:
         - name: code
           in: path
+          description: The unique UPC code of the product
           required: true
           schema:
             type: string
@@ -50,11 +65,14 @@ paths:
                 "$ref": "#/components/schemas/ProductResponseDto"
     delete:
       tags:
-        - product-controller
+        - Products
+      summary: Delete a product
+      description: This endpoint deletes a product based on its unique UPC code.
       operationId: deleteProduct
       parameters:
         - name: code
           in: path
+          description: The unique UPC code of the product
           required: true
           schema:
             type: string
@@ -65,14 +83,90 @@ paths:
             application/hal+json:
               schema:
                 "$ref": "#/components/schemas/SimpleResponse"
+  "/api/v1/customers/{reference}":
+    get:
+      tags:
+        - Customers
+      summary: Retrieve customer by reference ID
+      description: This endpoint fetches customer details by their unique reference
+        ID.
+      operationId: getCustomerByReference
+      parameters:
+        - name: reference
+          in: path
+          description: Unique reference ID of the customer
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/CustomerResponseDto"
+    put:
+      tags:
+        - Customers
+      summary: Update customer information
+      description: This endpoint updates a customer's information based on their unique
+        reference ID.
+      operationId: updateCustomer
+      parameters:
+        - name: reference
+          in: path
+          description: Unique reference ID of the customer
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CustomerRequestDto"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/CustomerResponseDto"
+    delete:
+      tags:
+        - Customers
+      summary: Delete a customer
+      description: This endpoint deletes a customer based on their unique reference
+        ID.
+      operationId: deleteCustomer
+      parameters:
+        - name: reference
+          in: path
+          description: Unique reference ID of the customer
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/SimpleResponse"
   "/api/v1/products":
     get:
       tags:
-        - product-controller
+        - Products
+      summary: Retrieve products by category
+      description: This endpoint fetches all products that belong to a specific category.
       operationId: getAllProducts_1
       parameters:
         - name: categoryName
           in: query
+          description: The name of the category
           required: false
           schema:
             type: string
@@ -87,9 +181,12 @@ paths:
                   "$ref": "#/components/schemas/ProductResponseDto"
     post:
       tags:
-        - product-controller
+        - Products
+      summary: Create a new product
+      description: This endpoint creates a new product in the system.
       operationId: createProduct
       requestBody:
+        description: Details of the product to create
         content:
           application/json:
             schema:
@@ -102,10 +199,82 @@ paths:
             application/hal+json:
               schema:
                 "$ref": "#/components/schemas/ProductResponseDto"
+  "/api/v1/orders":
+    post:
+      tags:
+        - Orders
+      summary: Create a new order
+      description: This endpoint creates a new order based on the provided details.
+      operationId: createOrder
+      requestBody:
+        description: Details of the order to create
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreateOrderRequestDto"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/OrderResponseDto"
+  "/api/v1/customers":
+    post:
+      tags:
+        - Customers
+      summary: Create a new customer
+      description: This endpoint creates a new customer in the system.
+      operationId: createCustomer
+      requestBody:
+        description: Data for creating a customer
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CustomerRequestDto"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/CustomerResponseDto"
+  "/api/v1/orders/{orderNumber}/status":
+    patch:
+      tags:
+        - Orders
+      summary: Update order status
+      description: This endpoint updates the status of an existing order.
+      operationId: updateOrderStatus
+      parameters:
+        - name: orderNumber
+          in: path
+          description: The unique identifier of the order
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/UpdateOrderStatusRequestDto"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/OrderResponseDto"
   "/api/v1/products/discount":
     get:
       tags:
-        - product-controller
+        - Products
+      summary: Retrieve all products with discount
+      description: This endpoint returns a list of all products with applied discount
       operationId: getDiscountedProducts
       responses:
         '200':
@@ -116,10 +285,79 @@ paths:
                 type: array
                 items:
                   "$ref": "#/components/schemas/ProductResponseDto"
+  "/api/v1/orders/{orderNumber}":
+    get:
+      tags:
+        - Orders
+      summary: Retrieve order by number
+      description: This endpoint fetches an order based on its unique identifier.
+      operationId: getOrder
+      parameters:
+        - name: orderNumber
+          in: path
+          description: The unique identifier of the order
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/OrderResponseDto"
+    delete:
+      tags:
+        - Orders
+      summary: Delete an order
+      description: This endpoint deletes an order based on its unique identifier.
+      operationId: deleteOrder
+      parameters:
+        - name: orderNumber
+          in: path
+          description: The unique identifier of the order
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/SimpleResponse"
+  "/api/v1/orders/customer/{customerId}":
+    get:
+      tags:
+        - Orders
+      summary: Retrieve orders by customer ID
+      description: This endpoint fetches all orders associated with a specific customer.
+      operationId: getCustomerOrders
+      parameters:
+        - name: customerId
+          in: path
+          description: The unique identifier of the customer
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/OrderResponseDto"
   "/api/v1/categories":
     get:
       tags:
-        - category-controller
+        - Categories
+      summary: Retrieve all categories
+      description: This endpoint returns a list of all available categories.
       operationId: getAllCategories
       responses:
         '200':
@@ -133,11 +371,14 @@ paths:
   "/api/v1/categories/{name}":
     get:
       tags:
-        - category-controller
+        - Categories
+      summary: Retrieve category by name
+      description: This endpoint fetches a category based on its name.
       operationId: getCategory
       parameters:
         - name: name
           in: path
+          description: The name of the category to retrieve
           required: true
           schema:
             type: string
@@ -162,42 +403,227 @@ components:
         code:
           pattern: "\\d{12,13}"
           type: string
+          description: UPC/EAN code of the product
+          example: '123456789012'
         name:
           maxLength: 100
           minLength: 0
           type: string
+          description: Name of the product. Should contain Nebula|Star|Cat|Cosmo|Galactic
+            wod
+          example: Star catphone
         description:
           maxLength: 255
           minLength: 0
           type: string
+          description: Description of the product
+          example: Flagship model from Andromeda galaxy
         price:
           type: number
+          description: Price of the product
           format: double
+          example: 69.99
         categoryNames:
           type: array
+          description: List of category names the product belongs to
           items:
             type: string
+            description: List of category names the product belongs to
+      description: Request to create or update a product
     ProductResponseDto:
       type: object
       properties:
         code:
           type: string
+          description: UPC/EAN code of the product
+          example: '123456789012'
         name:
           type: string
+          description: Name of the product. Should contain Nebula|Star|Cat|Cosmo|Galactic
+            wod
+          example: Star catphone
         description:
           type: string
+          description: Description of the product
+          example: Flagship model from Andromeda galaxy
         price:
           type: number
+          description: Price of the product
           format: double
+          example: 699.99
         categoryNames:
           type: array
+          description: List of category names the product belongs to
           items:
             type: string
+            description: List of category names the product belongs to
+      description: Response containing product details
+    CustomerRequestDto:
+      required:
+        - email
+        - fullName
+        - password
+        - username
+      type: object
+      properties:
+        fullName:
+          type: string
+          description: Full name of the customer
+          example: John Doe
+        username:
+          type: string
+          description: Username for the customer's account
+          example: johndoe123
+        password:
+          type: string
+          description: Password for the customer's account
+          example: securePassword123
+        email:
+          type: string
+          description: Email address of the customer
+          example: johndoe@example.com
+      description: Request to create a new customer
+    CustomerResponseDto:
+      type: object
+      properties:
+        customerReference:
+          type: string
+          description: Unique reference for the customer
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        fullName:
+          type: string
+          description: Full name of the customer
+          example: John Doe
+        username:
+          type: string
+          description: Username of the customer
+          example: johndoe
+        email:
+          type: string
+          description: Email address of the customer
+          example: johndoe@example.com
+      description: Response containing customer details
+    CreateOrderRequestDto:
+      required:
+        - customerReference
+        - orderItems
+      type: object
+      properties:
+        customerReference:
+          type: string
+          description: Customer reference in UUID format
+          example: 550e8400-e29b-41d4-a716-446655440000
+        orderItems:
+          type: array
+          description: List of items in the order
+          items:
+            "$ref": "#/components/schemas/OrderItemRequestDto"
+      description: Request to create a new order
+    OrderItemRequestDto:
+      required:
+        - currentPrice
+        - productCode
+        - quantity
+      type: object
+      properties:
+        productCode:
+          pattern: "\\d{12,13}"
+          type: string
+          description: UPC/EAN code of the product
+          example: '123456789012'
+        quantity:
+          type: integer
+          description: Quantity of the product ordered
+          format: int32
+          example: 2
+        currentPrice:
+          type: number
+          description: Price of the product at the time of order
+          format: double
+          example: 15.99
+      description: Request containing details of an order item
+    OrderItemResponseDto:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: Quantity of the product ordered
+          format: int32
+          example: 2
+        productCode:
+          type: string
+          description: UPC/EAN code of the product
+          example: '123456789012'
+        productOldPrice:
+          type: number
+          description: Price of the product at the time of order
+          format: double
+          example: 15.99
+      description: Response containing details of an order item
+    OrderResponseDto:
+      type: object
+      properties:
+        orderNumber:
+          type: string
+          description: Unique order number in UUID format
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        customerId:
+          type: string
+          description: Unique customer ID in UUID format
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440001
+        orderItems:
+          type: array
+          description: List of items in the order
+          items:
+            "$ref": "#/components/schemas/OrderItemResponseDto"
+        status:
+          type: string
+          description: Status of the order
+          example: COMPLETED
+          enum:
+            - PENDING
+            - PROCESSING
+            - CANCELED
+            - COMPLETED
+            - RETURNED
+        total:
+          type: number
+          description: Total amount of the order
+          format: double
+          example: 600
+        createdAt:
+          type: string
+          description: Date the order was created
+          format: date-time
+          example: '2024-12-19T10:15:30Z'
+      description: Response containing order details
+    UpdateOrderStatusRequestDto:
+      required:
+        - orderStatus
+      type: object
+      properties:
+        orderStatus:
+          type: string
+          description: New status for the order
+          example: PROCESSING
+          enum:
+            - PENDING
+            - PROCESSING
+            - CANCELED
+            - COMPLETED
+            - RETURNED
+      description: Request to update the status of an order
     CategoryResponseDto:
       type: object
       properties:
         name:
           type: string
+          description: Name of the category
+          example: Electronics
+      description: Response containing the category details
     SimpleResponse:
       type: object
       properties:

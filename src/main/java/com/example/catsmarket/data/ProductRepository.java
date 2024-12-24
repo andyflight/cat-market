@@ -15,6 +15,8 @@ public interface ProductRepository {
 
     Optional<Product> findByCode(String code);
 
+    Optional<Product> findProductIdProjection(String code);
+
     void deleteByCode(String code);
 
     void deleteAll();

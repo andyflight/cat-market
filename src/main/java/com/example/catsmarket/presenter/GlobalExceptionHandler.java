@@ -1,8 +1,10 @@
 package com.example.catsmarket.presenter;
 
 import com.example.catsmarket.application.exceptions.*;
+import com.example.catsmarket.domain.exceptions.EmptyOrderException;
 import com.example.catsmarket.featuretoggle.exception.FeatureDisabledException;
 import com.example.catsmarket.presenter.exceptions.ParamsViolationDetails;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -78,6 +80,39 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(NOT_FOUND, ex.getMessage());
         problemDetail.setType(URI.create("category-not-found"));
         problemDetail.setTitle("Category Not Found");
+        return problemDetail;
+    }
+
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    ProblemDetail handleOrderNotFoundException(OrderNotFoundException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(NOT_FOUND, ex.getMessage());
+        problemDetail.setType(URI.create("order-not-found"));
+        problemDetail.setTitle("Order Not Found");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(EmptyOrderException.class)
+    ProblemDetail handleEmptyOrderException(EmptyOrderException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(UNPROCESSABLE_ENTITY, ex.getMessage());
+        problemDetail.setType(URI.create("empty-order"));
+        problemDetail.setTitle("Empty Order");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(CustomerNotFoundException.class)
+    ProblemDetail handleCustomerNotFoundException(CustomerNotFoundException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(NOT_FOUND, ex.getMessage());
+        problemDetail.setType(URI.create("customer-not-found"));
+        problemDetail.setTitle("Customer Not Found");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    ProblemDetail handlePersistenceException(DataAccessException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(INTERNAL_SERVER_ERROR, ex.getMessage());
+        problemDetail.setType(URI.create("persistence-exception"));
+        problemDetail.setTitle("Persistence exception");
         return problemDetail;
     }
 

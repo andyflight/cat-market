@@ -1,9 +1,9 @@
 package com.example.catsmarket.application.impl;
 
 import com.example.catsmarket.application.PriceService;
-import com.example.catsmarket.application.context.recommendation.PriceValidationContext;
-import com.example.catsmarket.application.context.recommendation.PriceValidationRequest;
-import com.example.catsmarket.application.context.recommendation.PriceValidationResponse;
+import com.example.catsmarket.application.context.price.PriceValidationContext;
+import com.example.catsmarket.application.context.price.PriceValidationRequest;
+import com.example.catsmarket.application.context.price.PriceValidationResponse;
 import com.example.catsmarket.application.exceptions.PriceClientFailedException;
 import com.example.catsmarket.application.mapper.PriceValidationMapper;
 import com.example.catsmarket.common.FeatureName;
