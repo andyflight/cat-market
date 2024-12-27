@@ -13,7 +13,6 @@ import java.util.UUID;
 @Value
 @Builder
 public class Order {
-    Long id;
     UUID orderNumber;
     List<OrderItem> orderItems;
     OrderStatus status;
