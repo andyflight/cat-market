@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,9 +33,9 @@ public class CategoryServiceTest {
     void getAllCategories_shouldReturnAllCategories() {
 
         List<Category> expectedCategories = List.of(
-                Category.builder().id(1L).name("Food").build(),
-                Category.builder().id(2L).name("Toys").build(),
-                Category.builder().id(3L).name("Furniture").build()
+                Category.builder().id(UUID.fromString("48a61842-304e-4941-a868-fa2c453ca583")).name("Food").build(),
+                Category.builder().id(UUID.fromString("32ad2d3f-18ed-49f4-a24e-85b3f2771fd6")).name("Toys").build(),
+                Category.builder().id(UUID.fromString("e88f7f8a-4462-4082-b02e-6f1a114f722b")).name("Furniture").build()
         );
 
         when(categoryRepository.findAll()).thenReturn(expectedCategories);
@@ -49,7 +50,7 @@ public class CategoryServiceTest {
     @Test
     void getByName_shouldReturnCategory_WhenCategoryExists() {
         String categoryName = "Food";
-        Category expectedCategory = Category.builder().id(1L).name(categoryName).build();
+        Category expectedCategory = Category.builder().id(UUID.fromString("48a61842-304e-4941-a868-fa2c453ca583")).name(categoryName).build();
 
         when(categoryRepository.findByName(categoryName)).thenReturn(Optional.of(expectedCategory));
 
@@ -75,9 +76,9 @@ public class CategoryServiceTest {
     void getAllCategoriesByNames_shouldReturnAllCategories_WhenAllExist() {
         List<String> categoryNames = List.of("Food", "Toys", "Furniture");
         List<Category> expectedCategories = List.of(
-                Category.builder().id(1L).name("Food").build(),
-                Category.builder().id(2L).name("Toys").build(),
-                Category.builder().id(3L).name("Furniture").build()
+                Category.builder().id(UUID.fromString("48a61842-304e-4941-a868-fa2c453ca583")).name("Food").build(),
+                Category.builder().id(UUID.fromString("32ad2d3f-18ed-49f4-a24e-85b3f2771fd6")).name("Toys").build(),
+                Category.builder().id(UUID.fromString("e88f7f8a-4462-4082-b02e-6f1a114f722b")).name("Furniture").build()
         );
 
         when(categoryRepository.findAllByName(categoryNames)).thenReturn(expectedCategories);
@@ -92,8 +93,8 @@ public class CategoryServiceTest {
     void getAllCategoriesByNames_shouldThrowException_WhenSomeDoNotExist() {
         List<String> categoryNames = List.of("Food", "Toys", "Furniture");
         List<Category> categories = List.of(
-                Category.builder().id(1L).name("Food").build(),
-                Category.builder().id(3L).name("Furniture").build()
+                Category.builder().id(UUID.fromString("48a61842-304e-4941-a868-fa2c453ca583")).name("Food").build(),
+                Category.builder().id(UUID.fromString("e88f7f8a-4462-4082-b02e-6f1a114f722b")).name("Furniture").build()
         );
 
         when(categoryRepository.findAllByName(categoryNames)).thenReturn(categories);

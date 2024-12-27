@@ -12,7 +12,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@DisplayName("InMemory Category Repository Test")
+@DisplayName("Category Repository Test")
 public class InMemoryCategoryRepositoryTest {
 
     @Autowired

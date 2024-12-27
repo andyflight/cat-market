@@ -6,8 +6,8 @@ import com.example.catsmarket.application.ProductService;
 import com.example.catsmarket.application.context.product.ProductContext;
 import com.example.catsmarket.application.context.recommendation.PriceValidationContext;
 import com.example.catsmarket.application.exceptions.PriceNotValidException;
-import com.example.catsmarket.application.exceptions.ProductNotFoundException;
 import com.example.catsmarket.common.FeatureName;
+import com.example.catsmarket.application.exceptions.ProductNotFoundException;
 import com.example.catsmarket.domain.Category;
 import com.example.catsmarket.domain.Product;
 import com.example.catsmarket.data.ProductRepository;
@@ -37,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
         PriceValidationContext priceValidationContext = priceService.checkValidation(productContext.getPrice());
 
         if (priceValidationContext != null && Boolean.FALSE.equals(priceValidationContext.getIsValidated())) {
+            log.error("Price validation check failed {}", productContext.getPrice());
             throw new PriceNotValidException(String.valueOf(productContext.getPrice()));
         }
 
@@ -59,11 +60,15 @@ public class ProductServiceImpl implements ProductService {
         PriceValidationContext priceValidationContext = priceService.checkValidation(productContext.getPrice());
 
         if (priceValidationContext != null && Boolean.FALSE.equals(priceValidationContext.getIsValidated())) {
+            log.error("Price validation check failed {}", productContext.getPrice());
             throw new PriceNotValidException(String.valueOf(productContext.getPrice()));
         }
 
         Product oldProduct = productRepository.findByCode(code)
-                .orElseThrow(() -> new ProductNotFoundException(code));
+                .orElseThrow(() -> {
+                    log.error("Product with code {} not found", code);
+                    return new ProductNotFoundException(code);
+                });
 
         List<Category> categories = categoryService.getAllCategoriesByNames(productContext.getCategoryNames());
 
@@ -80,7 +85,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductByCode(String code) {
-        return productRepository.findByCode(code).orElseThrow(() -> new ProductNotFoundException(code));
+
+        return productRepository.findByCode(code).orElseThrow(() -> {
+            log.error("product with code {} not found", code);
+            return new ProductNotFoundException(code);
+        });
     }
 
     @Override

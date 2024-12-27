@@ -7,12 +7,14 @@ import com.example.catsmarket.presenter.dto.product.ProductResponseDto;
 import com.example.catsmarket.presenter.mapper.DtoProductMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @Validated
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class ProductController {
 
     @GetMapping("/{code}")
     public ResponseEntity<ProductResponseDto> getProductByCode(@PathVariable String code) {
+        log.info("Getting product by code {}", code);
         ProductResponseDto response = dtoProductMapper.toDto(productService.getProductByCode(code));
 
         return ResponseEntity.ok(response);
@@ -30,6 +33,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
+        log.info("Getting all products");
         List<ProductResponseDto> response = dtoProductMapper.toDto(
                 productService.getProducts()
         );
@@ -41,6 +45,7 @@ public class ProductController {
     public ResponseEntity<List<ProductResponseDto>> getAllProductsByCategoryName(
             @RequestParam(value = "categoryName", required = false) String categoryName
     ) {
+        log.info("Getting all products by category name {}", categoryName);
         List<ProductResponseDto> response = dtoProductMapper.toDto(
                 productService.getProductsByCategory(categoryName)
         );
@@ -50,6 +55,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductRequestDto request) {
+        log.info("Creating new product ");
         ProductResponseDto response = dtoProductMapper.toDto(
                 productService.createProduct(
                         dtoProductMapper.toContext(request)
@@ -63,6 +69,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> updateProduct(
             @PathVariable String code,
             @RequestBody @Valid ProductRequestDto request) {
+        log.info("Updating product with code {}", code);
         ProductResponseDto response = dtoProductMapper.toDto(
                 productService.updateProduct(
                         code,
@@ -75,6 +82,7 @@ public class ProductController {
 
     @DeleteMapping("/{code}")
     public ResponseEntity<SimpleResponse> deleteProduct(@PathVariable String code) {
+        log.info("Deleting product with code {}", code);
         productService.deleteProduct(code);
 
         return ResponseEntity.ok(new SimpleResponse("Successful"));

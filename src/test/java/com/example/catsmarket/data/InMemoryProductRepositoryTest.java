@@ -14,7 +14,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@DisplayName("InMemory Product Repository Test")
+@DisplayName("Product Repository Test")
 public class InMemoryProductRepositoryTest {
 
     @Autowired
