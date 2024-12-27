@@ -1,0 +1,154 @@
+---
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  "/api/v1/products/{code}":
+    get:
+      tags:
+        - product-controller
+      operationId: getProductByUpc
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/ProductResponseDto"
+    put:
+      tags:
+        - product-controller
+      operationId: updateProduct
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProductRequestDto"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/ProductResponseDto"
+    delete:
+      tags:
+        - product-controller
+      operationId: deleteProduct
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/SimpleResponse"
+  "/api/v1/products":
+    get:
+      tags:
+        - product-controller
+      operationId: getAllProducts_1
+      parameters:
+        - name: categoryName
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ProductResponseDto"
+    post:
+      tags:
+        - product-controller
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProductRequestDto"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/ProductResponseDto"
+components:
+  schemas:
+    ProductRequestDto:
+      required:
+        - categoryNames
+        - code
+        - description
+        - name
+        - price
+      type: object
+      properties:
+        code:
+          pattern: "\\d{12,13}"
+          type: string
+        name:
+          maxLength: 100
+          minLength: 0
+          type: string
+        description:
+          maxLength: 255
+          minLength: 0
+          type: string
+        price:
+          type: number
+          format: double
+        categoryNames:
+          type: array
+          items:
+            type: string
+    ProductResponseDto:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+        categoryNames:
+          type: array
+          items:
+            type: string
+    SimpleResponse:
+      type: object
+      properties:
+        message:
+          type: string

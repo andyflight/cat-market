@@ -18,8 +18,9 @@ ext {
     //Minimal Coverage
     minimumCoveragePerFile = 0.8
     filesExcludedFromCoverage = [
-            "**/*MarketplaceApplication.*",
-            "**/config/*Configuration.*"
+            "**/*Application.*",
+            "**/config/*Config.*",
+
     ]
 }
 
@@ -45,6 +46,7 @@ dependencies {
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.0.3'
     implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     implementation 'org.mapstruct:mapstruct:1.6.2'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
@@ -60,6 +62,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
     testImplementation 'org.projectlombok:lombok:1.18.34'
+
 
 }
 

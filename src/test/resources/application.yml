@@ -1,14 +1,8 @@
-spring:
-    application:
-        name: cats-market
-
 application:
     price-service:
         base-path: http://localhost:8081
         price: ${application.price-service.base-path}/api/v1/price/validation
 
-springdoc:
-    swagger-ui:
-        path: /swagger
-    api-docs:
-        path: /api-docs
+spring:
+    application:
+        name: cats-market

@@ -1,0 +1,21 @@
+{
+  "mappings": [
+    {
+      "id": "1e636f65-59a8-463b-9fee-803247a0b1bd",
+      "name": "Price-Service check price validation",
+      "request": {
+        "url": "/api/v1/price/validation",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "isValidated": true
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
