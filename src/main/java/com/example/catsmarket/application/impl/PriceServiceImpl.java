@@ -7,6 +7,8 @@ import com.example.catsmarket.application.context.recommendation.PriceValidation
 import com.example.catsmarket.application.exceptions.PriceClientFailedException;
 import com.example.catsmarket.application.mapper.PriceValidationMapper;
 import lombok.extern.slf4j.Slf4j;
+import com.example.catsmarket.common.FeatureName;
+import com.example.catsmarket.featuretoggle.annotation.FeatureToggle;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -34,6 +36,7 @@ public class PriceServiceImpl implements PriceService {
     }
 
     @Override
+    @FeatureToggle(value = FeatureName.PRICE_VALIDATION, throwExceptionOnDisabled = false)
     public PriceValidationContext checkValidation(Double price) {
 
         log.info("Checking price validation for price {}", price);

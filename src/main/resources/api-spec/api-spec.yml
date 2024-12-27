@@ -2,7 +2,7 @@
 openapi: 3.0.1
 info:
   title: OpenAPI definition
-  version: v1
+  version: v0
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -11,7 +11,7 @@ paths:
     get:
       tags:
         - product-controller
-      operationId: getProductByUpc
+      operationId: getProductByCode
       parameters:
         - name: code
           in: path
@@ -102,6 +102,52 @@ paths:
             application/hal+json:
               schema:
                 "$ref": "#/components/schemas/ProductResponseDto"
+  "/api/v1/products/discount":
+    get:
+      tags:
+        - product-controller
+      operationId: getDiscountedProducts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ProductResponseDto"
+  "/api/v1/categories":
+    get:
+      tags:
+        - category-controller
+      operationId: getAllCategories
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+  "/api/v1/categories/{name}":
+    get:
+      tags:
+        - category-controller
+      operationId: getCategory
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                "$ref": "#/components/schemas/CategoryResponseDto"
 components:
   schemas:
     ProductRequestDto:
@@ -147,6 +193,11 @@ components:
           type: array
           items:
             type: string
+    CategoryResponseDto:
+      type: object
+      properties:
+        name:
+          type: string
     SimpleResponse:
       type: object
       properties:

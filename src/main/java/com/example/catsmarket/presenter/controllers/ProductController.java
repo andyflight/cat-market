@@ -88,4 +88,11 @@ public class ProductController {
         return ResponseEntity.ok(new SimpleResponse("Successful"));
     }
 
+    @GetMapping("/discount")
+    public ResponseEntity<List<ProductResponseDto>> getDiscountedProducts() {
+        List<ProductResponseDto> response = dtoProductMapper.toDto(productService.getDiscountedProducts());
+
+        return ResponseEntity.ok(response);
+    }
+
 }

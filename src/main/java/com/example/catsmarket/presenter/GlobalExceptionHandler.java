@@ -1,6 +1,7 @@
 package com.example.catsmarket.presenter;
 
 import com.example.catsmarket.application.exceptions.*;
+import com.example.catsmarket.featuretoggle.exception.FeatureDisabledException;
 import com.example.catsmarket.presenter.exceptions.ParamsViolationDetails;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -62,6 +63,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<ParamsViolationDetails> validationResponse =
                 errors.stream().map(err -> ParamsViolationDetails.builder().reason(err.getDefaultMessage()).fieldName(err.getField()).build()).toList();
         return ResponseEntity.status(BAD_REQUEST).body(getValidationErrorsProblemDetail(validationResponse));
+    }
+
+    @ExceptionHandler(FeatureDisabledException.class)
+    ProblemDetail handleFeatureDisabledException(FeatureDisabledException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(NOT_FOUND, ex.getMessage());
+        problemDetail.setType(URI.create("feature-disabled"));
+        problemDetail.setTitle("Feature Disabled");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    ProblemDetail handleCategoryNotFoundException(CategoryNotFoundException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(NOT_FOUND, ex.getMessage());
+        problemDetail.setType(URI.create("category-not-found"));
+        problemDetail.setTitle("Category Not Found");
+        return problemDetail;
     }
 
 }

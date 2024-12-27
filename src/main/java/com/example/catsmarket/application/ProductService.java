@@ -18,4 +18,6 @@ public interface ProductService {
     List<Product> getProductsByCategory(String categoryName);
 
     void deleteProduct(String code);
+
+    List<Product> getDiscountedProducts();
 }
