@@ -13,7 +13,6 @@ import java.util.UUID;
 @Value
 @Builder(toBuilder = true)
 public class Order {
-    Long id;
     UUID orderNumber;
     Customer customer;
     List<OrderItem> orderItems;

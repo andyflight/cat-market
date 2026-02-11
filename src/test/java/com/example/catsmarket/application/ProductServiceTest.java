@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @DisplayName("Product Service Test")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProductServiceTest {
 
     @Autowired
