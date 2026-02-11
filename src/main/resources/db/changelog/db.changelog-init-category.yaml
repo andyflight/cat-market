@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: table-category
+      author: andyflight
+      changes:
+        - createSequence:
+            sequenceName: category_id_seq
+            incrementBy: 50
+
+        - createTable:
+            tableName: category
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueSequenceNext: category_id_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: category
+            columnNames: name
+            constraintName: uq_category_name
+
+

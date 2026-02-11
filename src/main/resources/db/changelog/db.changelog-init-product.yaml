@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: table-product
+      author: andyflight
+      changes:
+        - createSequence:
+            sequenceName: product_id_seq
+            incrementBy: 50
+
+        - createTable:
+            tableName: product
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueSequenceNext: product_id_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(13)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: product
+            columnNames: code
+            constraintName: uq_product_code
+
+
