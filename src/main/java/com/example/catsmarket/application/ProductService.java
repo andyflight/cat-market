@@ -20,4 +20,6 @@ public interface ProductService {
     void deleteProduct(String code);
 
     List<Product> getDiscountedProducts();
+
+    Product getProductId(String code);
 }

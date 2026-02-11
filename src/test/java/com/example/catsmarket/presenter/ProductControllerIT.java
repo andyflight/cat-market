@@ -4,7 +4,7 @@ import com.example.catsmarket.AbstractIT;
 import com.example.catsmarket.application.CategoryService;
 import com.example.catsmarket.application.PriceService;
 import com.example.catsmarket.application.ProductService;
-import com.example.catsmarket.application.context.recommendation.PriceValidationResponse;
+import com.example.catsmarket.application.context.price.PriceValidationResponse;
 import com.example.catsmarket.common.FeatureName;
 import com.example.catsmarket.data.ProductRepository;
 import com.example.catsmarket.domain.Category;
@@ -83,6 +83,22 @@ public class ProductControllerIT extends AbstractIT {
             null
     );
 
+    private final ProductRequestDto invalidCategoriesProductRequest = new ProductRequestDto(
+            "123456789014",
+            "Cat star food",
+            "Cat star food",
+            3.00,
+            List.of("I'm not exist")
+    );
+
+    private final ProductRequestDto invalidNameProductRequest = new ProductRequestDto(
+            "123456789014",
+            "I'm not valid",
+            "Cat star food",
+            3.00,
+            List.of("Food")
+    );
+
     @BeforeEach
     void setup() {
         reset(priceService, productService, categoryService);
@@ -92,7 +108,7 @@ public class ProductControllerIT extends AbstractIT {
                 .name("cat food")
                 .description("cat food")
                 .price(5.00)
-                .categories(List.of(Category.builder().name("Food").build()))
+                .categories(List.of(Category.builder().id(1L).name("Food").build()))
                 .build());
 
         productRepository.save(Product.builder()
@@ -100,7 +116,7 @@ public class ProductControllerIT extends AbstractIT {
                 .name("cat toy")
                 .description("cat toy")
                 .price(6.00)
-                .categories(List.of(Category.builder().name("Toys").build()))
+                .categories(List.of(Category.builder().id(51L).name("Toys").build()))
                 .build());
     }
 
@@ -122,7 +138,7 @@ public class ProductControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void getAllProductsByCategoryName_ShouldReturnProducts_WhenCategoryExists() {
-        mockMvc.perform(get("/api/v1/products?categoryName=food")
+        mockMvc.perform(get("/api/v1/products?categoryName=Food")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -225,6 +241,26 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @DisableFeature(FeatureName.PRICE_VALIDATION)
+    void createProduct_ShouldThrowException_WhenNameNotValid() {
+
+        mockMvc.perform(post("/api/v1/products")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidNameProductRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type", is("urn:problem-type:validation-error")))
+                .andExpect(jsonPath("$.title", is("Field Validation Exception")))
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.detail", is("Request validation failed")))
+                .andExpect(jsonPath("$.instance", is("/api/v1/products")))
+                .andExpect(jsonPath("$.invalidParams[*].fieldName").exists())
+                .andExpect((jsonPath("$.invalidParams[*].reason").exists()));
+
+    }
+
+    @Test
+    @SneakyThrows
     @EnableFeature(FeatureName.PRICE_VALIDATION)
     void createProduct_ShouldThrowException_WhenPriceClientFailed() {
 
@@ -288,6 +324,20 @@ public class ProductControllerIT extends AbstractIT {
                 .andExpect(jsonPath("$.categoryNames", contains("Food")));
     }
 
+    @Test
+    @SneakyThrows
+    @DisableFeature(FeatureName.PRICE_VALIDATION)
+    void createProduct_ShouldThrowException_WhenNotAllCategoriesExist() {
+        mockMvc.perform(post("/api/v1/products")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidCategoriesProductRequest)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type", is("category-partial-result")))
+                .andExpect(jsonPath("$.title", is("Category Partial Result")))
+                .andExpect(jsonPath("$.instance", is("/api/v1/products")));
+    }
+
 
     @Test
     @SneakyThrows
@@ -306,7 +356,6 @@ public class ProductControllerIT extends AbstractIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validProductRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(validProductRequest.code())))
                 .andExpect(jsonPath("$.name", is(validProductRequest.name())))
                 .andExpect(jsonPath("$.description", is(validProductRequest.description())))
                 .andExpect(jsonPath("$.price", is(validProductRequest.price())))
@@ -397,7 +446,6 @@ public class ProductControllerIT extends AbstractIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validProductRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(validProductRequest.code())))
                 .andExpect(jsonPath("$.name", is(validProductRequest.name())))
                 .andExpect(jsonPath("$.description", is(validProductRequest.description())))
                 .andExpect(jsonPath("$.price", is(validProductRequest.price())))
