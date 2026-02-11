@@ -1,4 +1,4 @@
-package com.example.catsmarket.application.context.recommendation;
+package com.example.catsmarket.application.context.price;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

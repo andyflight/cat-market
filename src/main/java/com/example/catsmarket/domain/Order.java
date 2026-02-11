@@ -11,9 +11,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Order {
     UUID orderNumber;
+    Customer customer;
     List<OrderItem> orderItems;
     OrderStatus status;
     Date createdAt;
@@ -24,7 +25,7 @@ public class Order {
 
         return this.orderItems.stream()
                 .filter(Objects::nonNull)
-                .mapToDouble(orderItem -> orderItem.getQuantity() * orderItem.getOldProductPrice())
+                .mapToDouble(orderItem -> orderItem.getQuantity() * orderItem.getProductOldPrice())
                 .sum();
     }
 

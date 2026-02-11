@@ -21,7 +21,7 @@ public class OrderTest {
             .orderNumber(UUID.randomUUID())
             .createdAt(new Date())
             .status(OrderStatus.PROCESSING)
-            .orderItems(List.of(OrderItem.builder().quantity(2).oldProductPrice(5.00).build()))
+            .orderItems(List.of(OrderItem.builder().quantity(2).productOldPrice(5.00).build()))
             .build();
 
     private final Order orderWithoutItems =  Order.builder()

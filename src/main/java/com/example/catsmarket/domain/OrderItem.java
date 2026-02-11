@@ -11,5 +11,5 @@ public class OrderItem {
     UUID id;
     Product product;
     Integer quantity;
-    Double oldProductPrice;
+    Double productOldPrice;
 }

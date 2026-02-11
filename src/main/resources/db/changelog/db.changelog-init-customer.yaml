@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: table-customer
+      author: andyflight
+      changes:
+        - createSequence:
+            sequenceName: customer_id_seq
+            incrementBy: 50
+
+        - createTable:
+            tableName: customer
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueSequenceNext: customer_id_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: customer_reference
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fullname
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: customer
+            columnNames: username
+            constraintName: uq_customer_username

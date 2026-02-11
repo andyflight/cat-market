@@ -4,17 +4,23 @@ import com.example.catsmarket.AbstractIT;
 import com.example.catsmarket.application.CategoryService;
 import com.example.catsmarket.application.PriceService;
 import com.example.catsmarket.application.ProductService;
-import com.example.catsmarket.application.context.recommendation.PriceValidationResponse;
+import com.example.catsmarket.application.context.price.PriceValidationResponse;
+import com.example.catsmarket.common.FeatureName;
 import com.example.catsmarket.data.ProductRepository;
 import com.example.catsmarket.domain.Category;
 import com.example.catsmarket.domain.Product;
+import com.example.catsmarket.featuretoggle.FeatureToggleExtension;
+import com.example.catsmarket.featuretoggle.annotation.DisableFeature;
+import com.example.catsmarket.featuretoggle.annotation.EnableFeature;
 import com.example.catsmarket.presenter.dto.product.ProductRequestDto;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
@@ -36,7 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @AutoConfigureMockMvc
-@DisplayName("Order Controller IT")
+@DisplayName("Product Controller IT")
+@ExtendWith(FeatureToggleExtension.class)
 public class ProductControllerIT extends AbstractIT {
 
     @Autowired
@@ -47,6 +54,9 @@ public class ProductControllerIT extends AbstractIT {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Value("${application.features.discount.value}")
+    private Double discountValue;
 
     @SpyBean
     private PriceService priceService;
@@ -73,6 +83,22 @@ public class ProductControllerIT extends AbstractIT {
             null
     );
 
+    private final ProductRequestDto invalidCategoriesProductRequest = new ProductRequestDto(
+            "123456789014",
+            "Cat star food",
+            "Cat star food",
+            3.00,
+            List.of("I'm not exist")
+    );
+
+    private final ProductRequestDto invalidNameProductRequest = new ProductRequestDto(
+            "123456789014",
+            "I'm not valid",
+            "Cat star food",
+            3.00,
+            List.of("Food")
+    );
+
     @BeforeEach
     void setup() {
         reset(priceService, productService, categoryService);
@@ -82,7 +108,7 @@ public class ProductControllerIT extends AbstractIT {
                 .name("cat food")
                 .description("cat food")
                 .price(5.00)
-                .categories(List.of(Category.builder().name("Food").build()))
+                .categories(List.of(Category.builder().id(1L).name("Food").build()))
                 .build());
 
         productRepository.save(Product.builder()
@@ -90,7 +116,7 @@ public class ProductControllerIT extends AbstractIT {
                 .name("cat toy")
                 .description("cat toy")
                 .price(6.00)
-                .categories(List.of(Category.builder().name("Toys").build()))
+                .categories(List.of(Category.builder().id(51L).name("Toys").build()))
                 .build());
     }
 
@@ -112,7 +138,7 @@ public class ProductControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void getAllProductsByCategoryName_ShouldReturnProducts_WhenCategoryExists() {
-        mockMvc.perform(get("/api/v1/products?categoryName=food")
+        mockMvc.perform(get("/api/v1/products?categoryName=Food")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -163,6 +189,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void createProduct_ShouldCreateProduct_WhenRequestValid() {
 
 
@@ -187,6 +214,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void createProduct_ShouldThrowException_WhenRequestNotValid() {
 
         stubFor(WireMock.post("/api/v1/price/validation")
@@ -213,6 +241,27 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @DisableFeature(FeatureName.PRICE_VALIDATION)
+    void createProduct_ShouldThrowException_WhenNameNotValid() {
+
+        mockMvc.perform(post("/api/v1/products")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidNameProductRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type", is("urn:problem-type:validation-error")))
+                .andExpect(jsonPath("$.title", is("Field Validation Exception")))
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.detail", is("Request validation failed")))
+                .andExpect(jsonPath("$.instance", is("/api/v1/products")))
+                .andExpect(jsonPath("$.invalidParams[*].fieldName").exists())
+                .andExpect((jsonPath("$.invalidParams[*].reason").exists()));
+
+    }
+
+    @Test
+    @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void createProduct_ShouldThrowException_WhenPriceClientFailed() {
 
         stubFor(WireMock.post("/api/v1/price/validation")
@@ -236,6 +285,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void createProduct_ShouldThrowException_WhenPriceNotValid() {
 
         stubFor(WireMock.post("/api/v1/price/validation")
@@ -257,8 +307,41 @@ public class ProductControllerIT extends AbstractIT {
                 .andExpect(jsonPath("$.instance", is("/api/v1/products")));
     }
 
+
     @Test
     @SneakyThrows
+    @DisableFeature(FeatureName.PRICE_VALIDATION)
+    void createProduct_ShouldCreateProduct_WhenRequestValidAndValidationDisabled() {
+        mockMvc.perform(post("/api/v1/products")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validProductRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(validProductRequest.code())))
+                .andExpect(jsonPath("$.name", is(validProductRequest.name())))
+                .andExpect(jsonPath("$.description", is(validProductRequest.description())))
+                .andExpect(jsonPath("$.price", is(validProductRequest.price())))
+                .andExpect(jsonPath("$.categoryNames", contains("Food")));
+    }
+
+    @Test
+    @SneakyThrows
+    @DisableFeature(FeatureName.PRICE_VALIDATION)
+    void createProduct_ShouldThrowException_WhenNotAllCategoriesExist() {
+        mockMvc.perform(post("/api/v1/products")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidCategoriesProductRequest)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type", is("category-partial-result")))
+                .andExpect(jsonPath("$.title", is("Category Partial Result")))
+                .andExpect(jsonPath("$.instance", is("/api/v1/products")));
+    }
+
+
+    @Test
+    @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void updateProduct_ShouldUpdateProduct_WhenRequestValid() {
 
         stubFor(WireMock.post("/api/v1/price/validation")
@@ -273,7 +356,6 @@ public class ProductControllerIT extends AbstractIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validProductRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(validProductRequest.code())))
                 .andExpect(jsonPath("$.name", is(validProductRequest.name())))
                 .andExpect(jsonPath("$.description", is(validProductRequest.description())))
                 .andExpect(jsonPath("$.price", is(validProductRequest.price())))
@@ -282,6 +364,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void updateProduct_ShouldThrowException_WhenRequestNotValid() {
 
         stubFor(WireMock.post("/api/v1/price/validation")
@@ -308,6 +391,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void updateProduct_ShouldThrowException_WhenPriceNotValid() {
 
         stubFor(WireMock.post("/api/v1/price/validation")
@@ -332,6 +416,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @EnableFeature(FeatureName.PRICE_VALIDATION)
     void updateProduct_ShouldThrowException_WhenProductDoesNotExist() {
 
         stubFor(WireMock.post("/api/v1/price/validation")
@@ -354,6 +439,21 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @DisableFeature(FeatureName.PRICE_VALIDATION)
+    void updateProduct_ShouldUpdateProduct_WhenRequestValidAndValidationDisabled() {
+        mockMvc.perform(put("/api/v1/products/123456789012")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validProductRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(validProductRequest.name())))
+                .andExpect(jsonPath("$.description", is(validProductRequest.description())))
+                .andExpect(jsonPath("$.price", is(validProductRequest.price())))
+                .andExpect(jsonPath("$.categoryNames", contains("Food")));
+    }
+
+    @Test
+    @SneakyThrows
     void deleteProduct_ShouldDeleteProduct_WhenProductExists() {
 
         mockMvc.perform(delete("/api/v1/products/123456789012")
@@ -370,6 +470,38 @@ public class ProductControllerIT extends AbstractIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", is("Successful")));
     }
+
+    @Test
+    @SneakyThrows
+    @EnableFeature(FeatureName.DISCOUNT)
+    void getDiscountedProducts_ShouldReturnProducts_WhenDiscountEnabled() {
+
+        mockMvc.perform(get("/api/v1/products/discount"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[*].code").exists())
+                .andExpect(jsonPath("$[*].name").exists())
+                .andExpect(jsonPath("$[*].description").exists())
+                .andExpect(jsonPath("$[*].price").exists())
+                .andExpect(jsonPath("$[*].categoryNames").exists())
+                 .andExpect(jsonPath("$[?(@.code == '123456789012')].price").value(5.00 * (1 - discountValue)))
+                .andExpect(jsonPath("$[?(@.code == '123456789013')].price").value(6.00 * (1 - discountValue)));
+    }
+
+    @Test
+    @SneakyThrows
+    @DisableFeature(FeatureName.DISCOUNT)
+    void getDiscountedProducts_ShouldThrowException_WhenFeatureDisabled() {
+
+        mockMvc.perform(get("/api/v1/products/discount"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type", is("feature-disabled")))
+                .andExpect(jsonPath("$.title", is("Feature Disabled")))
+                .andExpect(jsonPath("$.status", is(404)))
+                .andExpect(jsonPath("$.detail", is("Feature discount is disabled")))
+                .andExpect(jsonPath("$.instance", is("/api/v1/products/discount")));
+    }
+
 
 
 }
